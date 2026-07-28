@@ -1,0 +1,456 @@
+-- =====================================================
+-- مرحله 1: ساخت دیتابیس
+-- =====================================================
+CREATE DATABASE IF NOT EXISTS HotelManagementSystem;
+USE HotelManagementSystem;
+-- =====================================================
+
+-- 1. جدول هتل (Hotel) - از PDF اول
+CREATE TABLE Hotel (
+    hotel_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    code VARCHAR(20) UNIQUE NOT NULL,
+    address TEXT,
+    phone_number VARCHAR(20),
+    email VARCHAR(100),
+    total_floors INT,
+    total_rooms INT,
+    star_rating INT CHECK (star_rating BETWEEN 1 AND 5),
+    facilities TEXT,
+    manager_name VARCHAR(100),
+    website VARCHAR(150)
+);
+
+-- 2. جدول امکانات هتل (Hotel_facility) - ویژگی چندمقداری از فایل دوم
+CREATE TABLE Hotel_facility (
+    hotel_id INT NOT NULL,
+    facility_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (hotel_id, facility_name),
+    FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id) ON DELETE CASCADE
+);
+
+-- 3. جدول تلفن (Phone) - ویژگی چندمقداری برای Hotel, Customer, Staff از فایل دوم
+CREATE TABLE Phone (
+    phone_id INT PRIMARY KEY AUTO_INCREMENT,
+    phone_number VARCHAR(20) NOT NULL,
+    person_id INT NOT NULL,
+    person_type ENUM('hotel', 'customer', 'staff') NOT NULL
+);
+
+-- 4. جدول نوع اتاق (RoomType) - از PDF اول
+CREATE TABLE RoomType (
+    room_type_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    description TEXT,
+    default_capacity INT,
+    min_price_per_night DECIMAL(10,2),
+    max_price_per_night DECIMAL(10,2),
+    min_booking_count INT,
+    max_booking_count INT,
+    status ENUM('available', 'unavailable') DEFAULT 'available'
+);
+
+-- 5. جدول اتاق (Room)
+CREATE TABLE Room (
+    room_id INT PRIMARY KEY AUTO_INCREMENT,
+    room_number VARCHAR(10) NOT NULL,
+    floor_number INT,
+    status ENUM('empty', 'reserved', 'occupied', 'cleaning', 'out_of_service') DEFAULT 'empty',
+    standard_capacity INT,
+    max_capacity INT,
+    standard_price_per_night DECIMAL(10,2),
+    amenities TEXT,
+    room_type_id INT,
+    hotel_id INT,
+    FOREIGN KEY (room_type_id) REFERENCES RoomType(room_type_id) ON DELETE SET NULL,
+    FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id) ON DELETE CASCADE
+);
+
+-- 6. جدول مشتری (Customer) 
+CREATE TABLE Customer (
+    customer_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    national_id VARCHAR(20) UNIQUE NOT NULL,
+    birth_date DATE,
+    gender ENUM('male', 'female', 'other'),
+    mobile_phone VARCHAR(20),
+    landline_phone VARCHAR(20),
+    email VARCHAR(100),
+    address TEXT,
+    first_reservation_date DATE,
+    total_stays INT DEFAULT 0,
+    membership_level ENUM('standard', 'silver', 'gold') DEFAULT 'standard',
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_picture VARCHAR(255)
+);
+
+-- 7. جدول کارکنان (Staff) 
+CREATE TABLE Staff (
+    staff_id INT PRIMARY KEY AUTO_INCREMENT,
+    personal_code VARCHAR(20) UNIQUE NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    national_id VARCHAR(20) UNIQUE NOT NULL,
+    birth_date DATE,
+    address TEXT,
+    job_title VARCHAR(50),
+    access_level ENUM('admin', 'reception', 'housekeeping', 'cashier') NOT NULL,
+    hire_date DATE,
+    base_salary DECIMAL(10,2),
+    bank_account_info TEXT,
+    employment_status ENUM('active', 'on_leave', 'terminated') DEFAULT 'active',
+    hotel_id INT,
+    FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id) ON DELETE SET NULL
+);
+
+-- 8. جدول مدیر (Manager) 
+CREATE TABLE Manager (
+    staff_id INT PRIMARY KEY,
+    management_level VARCHAR(50),
+    bonus DECIMAL(10,2),
+    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
+);
+
+-- 9. جدول پذیرش (Receptionist) 
+CREATE TABLE Receptionist (
+    staff_id INT PRIMARY KEY,
+    shift ENUM('morning', 'evening', 'night'),
+    desk_number INT,
+    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
+);
+
+-- 10. جدول نظافت (Housekeeping) 
+CREATE TABLE Housekeeping (
+    staff_id INT PRIMARY KEY,
+    area_responsibility VARCHAR(100),
+    tools_assigned TEXT,
+    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
+);
+
+-- 11. جدول رزرو (Reservation)
+CREATE TABLE Reservation (
+    reservation_id INT PRIMARY KEY AUTO_INCREMENT,
+    reservation_number VARCHAR(20) UNIQUE NOT NULL,
+    reservation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    check_in_date DATE NOT NULL,
+    check_out_date DATE NOT NULL,
+    nights INT,
+    total_guests INT,
+    adults INT,
+    children INT,
+    status ENUM('confirmed', 'pending', 'cancelled', 'completed') DEFAULT 'pending',
+    estimated_total DECIMAL(10,2),
+    booking_method ENUM('online', 'phone', 'in_person') DEFAULT 'online',
+    discount_code VARCHAR(50),
+    room_id INT,
+    customer_id INT,
+    FOREIGN KEY (room_id) REFERENCES Room(room_id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE
+);
+
+-- 12. جدول پرداخت (Payment) 
+CREATE TABLE Payment (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    payment_number VARCHAR(20) UNIQUE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_method ENUM('online', 'card', 'cash', 'bank_transfer') NOT NULL,
+    transaction_tracking_id VARCHAR(100),
+    status ENUM('successful', 'failed', 'pending') DEFAULT 'pending',
+    source_account_name VARCHAR(100),
+    reservation_id INT,
+    FOREIGN KEY (reservation_id) REFERENCES Reservation(reservation_id) ON DELETE SET NULL
+);
+
+-- 13. جدول فاکتور (Invoice) 
+CREATE TABLE Invoice (
+    invoice_id INT PRIMARY KEY AUTO_INCREMENT,
+    invoice_number VARCHAR(20) UNIQUE NOT NULL,
+    issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    grand_total DECIMAL(10,2),
+    paid_amount DECIMAL(10,2),
+    remaining_amount DECIMAL(10,2),
+    cost_details TEXT,
+    status ENUM('settled', 'unsettled') DEFAULT 'unsettled',
+    reservation_id INT,
+    customer_id INT,
+    issued_by_staff_id INT,
+    FOREIGN KEY (reservation_id) REFERENCES Reservation(reservation_id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE,
+    FOREIGN KEY (issued_by_staff_id) REFERENCES Staff(staff_id) ON DELETE SET NULL
+);
+
+-- 14. جدول فاکتور شرکتی (Corporate_Invoice) 
+CREATE TABLE Corporate_Invoice (
+    invoice_id INT PRIMARY KEY,
+    company_name VARCHAR(100) NOT NULL,
+    company_registration_number VARCHAR(50),
+    FOREIGN KEY (invoice_id) REFERENCES Invoice(invoice_id) ON DELETE CASCADE
+);
+
+-- 15. جدول فاکتور شخصی (Individual_Invoice) 
+CREATE TABLE Individual_Invoice (
+    invoice_id INT PRIMARY KEY,
+    national_id_customer VARCHAR(20),
+    FOREIGN KEY (invoice_id) REFERENCES Invoice(invoice_id) ON DELETE CASCADE
+);
+
+-- 16. جدول خدمات (Service) 
+CREATE TABLE Service (
+    service_id INT PRIMARY KEY AUTO_INCREMENT,
+    service_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    base_fee DECIMAL(10,2),
+    unit_of_measure ENUM('hourly', 'count', 'kg') DEFAULT 'count',
+    service_hours VARCHAR(100),
+    responsible_staff_id INT,
+    room_id INT,
+    customer_id INT,
+    reservation_id INT,
+    FOREIGN KEY (responsible_staff_id) REFERENCES Staff(staff_id) ON DELETE SET NULL,
+    FOREIGN KEY (room_id) REFERENCES Room(room_id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE,
+    FOREIGN KEY (reservation_id) REFERENCES Reservation(reservation_id) ON DELETE CASCADE
+);
+
+-- 17. جدول بازخورد (Feedback)
+CREATE TABLE Feedback (
+    feedback_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT NOT NULL,
+    reservation_id INT,
+    feedback_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    feedback_text TEXT,
+    overall_rating INT CHECK (overall_rating BETWEEN 1 AND 5),
+    room_quality_rating INT CHECK (room_quality_rating BETWEEN 1 AND 5),
+    service_quality_rating INT CHECK (service_quality_rating BETWEEN 1 AND 5),
+    staff_behavior_rating INT CHECK (staff_behavior_rating BETWEEN 1 AND 5),
+    status ENUM('pending', 'processing', 'done') DEFAULT 'pending',
+    feedback_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    feedback_content TEXT,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) ON DELETE CASCADE,
+    FOREIGN KEY (reservation_id) REFERENCES Reservation(reservation_id) ON DELETE SET NULL
+);
+
+
+
+-- =====================================================
+-- 1. داده‌های جدول Hotel
+-- =====================================================
+INSERT INTO Hotel (name, code, address, phone_number, email, total_floors, total_rooms, star_rating, facilities, manager_name, website) VALUES
+('هتل پارسیان', 'H001', 'تهران، خیابان ولیعصر، نبش خیابان پارک', '02188765432', 'info@parsianhotel.com', 5, 120, 5, 'استخر، سونا، جکوزی، رستوران، پارکینگ', 'احمد رضایی', 'www.parsianhotel.com'),
+('هتل اسپیناس', 'H002', 'تهران، خیابان سعادت‌آباد', '02188543210', 'contact@espinas.com', 12, 250, 5, 'سالن همایش، استخر، اسپا، کافی‌شاپ', 'محمد کریمی', 'www.espinas.com'),
+('هتل المپیک', 'H003', 'تهران، خیابان المپیک', '02144789123', 'info@olympic.com', 8, 180, 4, 'استخر، رستوران، پارکینگ', 'سعید احمدی', 'www.olympichotel.com'),
+('هتل آتیک', 'H004', 'مشهد، بلوار احمدآباد', '05137654321', 'info@atic.com', 4, 80, 4, 'رستوران، کافی‌شاپ، پارکینگ', 'رضا نوروزی', 'www.atichotel.com'),
+('هتل درویشی', 'H005', 'مشهد، خیابان امام رضا', '05132234567', 'info@darvishee.com', 6, 110, 4, 'استخر، سونا، رستوران', 'علی درویشی', 'www.darvishee.com'),
+('هتل همای', 'H006', 'اصفهان، چهارباغ عباسی', '03132223456', 'info@homay.com', 3, 60, 5, 'تالار، استخر، رستوران سنتی', 'مهدی همایون', 'www.homayhotel.com'),
+('هتل عباسی', 'H007', 'اصفهان، میدان امام', '03132224567', 'info@abbasi.com', 4, 150, 5, 'رستوران سنتی، استخر، موزه', 'عباس صفوی', 'www.abbasihotel.com'),
+('هتل لاله', 'H008', 'تبریز، خیابان امام', '04135554321', 'info@laleh.com', 5, 95, 3, 'رستوران، پارکینگ', 'لطیف پور', 'www.lalehhotel.com'),
+('هتل بزرگ شیراز', 'H009', 'شیراز، بلوار کریمخان', '07132345678', 'info@shirazgrand.com', 7, 130, 4, 'استخر، رستوران، کافی‌شاپ', 'رضا حافظی', 'www.shirazgrand.com'),
+('هتل کوثر', 'H010', 'قم، بلوار جمهوری', '02537765432', 'info@kowsar.com', 4, 85, 4, 'رستوران، پارکینگ، نمازخانه', 'جواد حسینی', 'www.kowsarhotel.com');
+
+-- =====================================================
+-- 2. داده‌های جدول Hotel_facility
+-- =====================================================
+INSERT INTO Hotel_facility (hotel_id, facility_name) VALUES
+(1, 'استخر'), (1, 'سونا'), (1, 'جکوزی'), (1, 'رستوران'),
+(2, 'سالن همایش'), (2, 'استخر'), (2, 'اسپا'),
+(3, 'استخر'), (3, 'رستوران'),
+(4, 'رستوران'), (4, 'کافی‌شاپ'),
+(5, 'استخر'), (5, 'سونا'), (5, 'رستوران'),
+(6, 'تالار'), (6, 'استخر'), (6, 'رستوران سنتی'),
+(7, 'رستوران سنتی'), (7, 'استخر'), (7, 'موزه'),
+(8, 'رستوران'), (8, 'پارکینگ'),
+(9, 'استخر'), (9, 'رستوران'), (9, 'کافی‌شاپ'),
+(10, 'رستوران'), (10, 'پارکینگ'), (10, 'نمازخانه');
+
+-- =====================================================
+-- 3. داده‌های جدول Phone
+-- =====================================================
+INSERT INTO Phone (phone_number, person_id, person_type) VALUES
+('02188765432', 1, 'hotel'),
+('02188765433', 1, 'hotel'),
+('09121234567', 1, 'customer'),
+('09129876543', 2, 'customer'),
+('09351234567', 3, 'customer'),
+('09101234567', 1, 'staff'),
+('09111234567', 2, 'staff'),
+('09121234568', 3, 'staff'),
+('02188543210', 2, 'hotel'),
+('05137654321', 4, 'hotel');
+
+-- =====================================================
+-- 4. داده‌های جدول RoomType
+-- =====================================================
+INSERT INTO RoomType (name, description, default_capacity, min_price_per_night, max_price_per_night, min_booking_count, max_booking_count, status) VALUES
+('استاندارد', 'اتاق ساده با امکانات پایه', 2, 500000, 800000, 1, 10, 'available'),
+('دبل', 'اتاق دو تخته', 2, 700000, 1000000, 1, 8, 'available'),
+('تویین', 'اتاق دو تخته مجزا', 2, 750000, 1100000, 1, 8, 'available'),
+('جونیور سوئیت', 'اتاق بزرگ با نشیمن', 3, 1200000, 1800000, 1, 5, 'available'),
+('رویال سوئیت', 'لوکس‌ترین اتاق', 4, 2500000, 4000000, 1, 3, 'available'),
+('خانوادگی', 'مناسب برای خانواده', 5, 1500000, 2200000, 1, 6, 'available'),
+('تک نفره', 'اتاق یک تخته', 1, 400000, 600000, 1, 10, 'available');
+
+-- =====================================================
+-- 5. داده‌های جدول Room
+-- =====================================================
+INSERT INTO Room (room_number, floor_number, status, standard_capacity, max_capacity, standard_price_per_night, amenities, room_type_id, hotel_id) VALUES
+('101', 1, 'empty', 2, 2, 550000, 'تلویزیون، یخچال، اینترنت', 1, 1),
+('102', 1, 'occupied', 2, 2, 550000, 'تلویزیون، یخچال، اینترنت', 1, 1),
+('201', 2, 'reserved', 2, 2, 750000, 'تلویزیون، یخچال، اینترنت، بخاری', 2, 1),
+('202', 2, 'cleaning', 2, 2, 750000, 'تلویزیون، یخچال، اینترنت، بخاری', 2, 1),
+('301', 3, 'empty', 3, 4, 1300000, 'تلویزیون، یخچال، اینترنت، نشیمن', 4, 1),
+('501', 5, 'empty', 4, 6, 2800000, 'تلویزیون، یخچال، اینترنت، جکوزی، نشیمن', 5, 1),
+('105', 1, 'empty', 2, 2, 520000, 'تلویزیون، یخچال', 1, 2),
+('205', 2, 'occupied', 2, 2, 720000, 'تلویزیون، یخچال، اینترنت', 2, 2),
+('305', 3, 'empty', 3, 4, 1250000, 'تلویزیون، یخچال، اینترنت، نشیمن', 4, 2),
+('110', 1, 'empty', 1, 1, 420000, 'تلویزیون، اینترنت', 7, 3);
+
+-- =====================================================
+-- 6. داده‌های جدول Customer
+-- =====================================================
+INSERT INTO Customer (first_name, last_name, national_id, birth_date, gender, mobile_phone, landline_phone, email, address, first_reservation_date, total_stays, membership_level) VALUES
+('احمد', 'رضایی', '0012345678', '1985-04-15', 'male', '09121234567', '02188765432', 'ahmad.rezaee@email.com', 'تهران، خیابان آزادی', '2023-01-10', 5, 'gold'),
+('مریم', 'کریمی', '0023456789', '1990-07-22', 'female', '09129876543', '02188765433', 'maryam.karimi@email.com', 'تهران، خیابان ولیعصر', '2023-02-15', 3, 'silver'),
+('رضا', 'نوروزی', '0034567890', '1982-11-05', 'male', '09351234567', '05137654321', 'reza.norozi@email.com', 'مشهد، بلوار احمدآباد', '2023-03-20', 8, 'gold'),
+('سارا', 'احمدی', '0045678901', '1995-02-28', 'female', '09101234567', '03132223456', 'sara.ahmadi@email.com', 'اصفهان، چهارباغ', '2023-04-25', 2, 'standard'),
+('علی', 'محمدی', '0056789012', '1988-09-17', 'male', '09111234567', '02188543210', 'ali.mohammadi@email.com', 'تهران، سعادت‌آباد', '2023-05-30', 4, 'silver'),
+('فاطمه', 'حسینی', '0067890123', '1993-12-10', 'female', '09121234568', '05132234567', 'fatemeh.hosseini@email.com', 'مشهد، خیابان امام', '2023-06-05', 6, 'gold'),
+('حسین', 'عباسی', '0078901234', '1980-03-25', 'male', '09131234567', '03132224567', 'hossein.abbasi@email.com', 'اصفهان، میدان امام', '2023-07-12', 7, 'gold'),
+('زهرا', 'قاسمی', '0089012345', '1998-08-14', 'female', '09141234567', '04135554321', 'zahra.ghasemi@email.com', 'تبریز، خیابان امام', '2023-08-18', 1, 'standard'),
+('مهدی', 'کاظمی', '0090123456', '1987-04-05', 'male', '09151234567', '07132345678', 'mehdi.kazemi@email.com', 'شیراز، بلوار کریمخان', '2023-09-22', 3, 'silver'),
+('نرگس', 'پورحسن', '0101234567', '1992-06-30', 'female', '09161234567', '02537765432', 'narges.poorhasan@email.com', 'قم، بلوار جمهوری', '2023-10-27', 2, 'standard');
+
+-- =====================================================
+-- 7. داده‌های جدول Staff
+-- =====================================================
+INSERT INTO Staff (personal_code, first_name, last_name, national_id, birth_date, address, job_title, access_level, hire_date, base_salary, bank_account_info, employment_status, hotel_id) VALUES
+('EMP001', 'رضا', 'مدیری', '1111111111', '1975-03-10', 'تهران، خیابان انقلاب', 'مدیرعامل', 'admin', '2010-01-01', 15000000, 'IR0123456789', 'active', 1),
+('EMP002', 'سعید', 'نظری', '2222222222', '1985-07-22', 'تهران، خیابان آزادی', 'پذیرش', 'reception', '2015-03-15', 6000000, 'IR0234567890', 'active', 1),
+('EMP003', 'مریم', 'صادقی', '3333333333', '1990-11-05', 'تهران، خیابان ولیعصر', 'سرپرست نظافت', 'housekeeping', '2018-06-20', 5500000, 'IR0345678901', 'active', 1),
+('EMP004', 'علی', 'رضوی', '4444444444', '1988-09-18', 'مشهد، احمدآباد', 'صندوقدار', 'cashier', '2016-02-10', 6500000, 'IR0456789012', 'active', 4),
+('EMP005', 'احمد', 'کریمی', '5555555555', '1982-12-01', 'اصفهان، چهارباغ', 'مدیر', 'admin', '2012-05-05', 14000000, 'IR0567890123', 'active', 6),
+('EMP006', 'فاطمه', 'نوروزی', '6666666666', '1992-04-25', 'شیراز، بلوار کریمخان', 'پذیرش', 'reception', '2019-09-10', 5800000, 'IR0678901234', 'on_leave', 9),
+('EMP007', 'حسن', 'حسینی', '7777777777', '1987-08-14', 'قم، جمهوری', 'نظافت', 'housekeeping', '2020-01-15', 4500000, 'IR0789012345', 'active', 10),
+('EMP008', 'زهرا', 'عباسی', '8888888888', '1995-02-20', 'تهران، سعادت‌آباد', 'صندوقدار', 'cashier', '2017-11-01', 6200000, 'IR0890123456', 'active', 2),
+('EMP009', 'محمدرضا', 'کاظمی', '9999999999', '1983-06-12', 'تبریز، امام', 'مدیر', 'admin', '2014-07-07', 13500000, 'IR0901234567', 'active', 8),
+('EMP010', 'نگار', 'اسدی', '1010101010', '1993-10-30', 'مشهد، خیابان امام', 'پذیرش', 'reception', '2021-03-20', 5500000, 'IR1012345678', 'active', 5);
+
+-- =====================================================
+-- 8. داده‌های جدول Manager (ساب‌کلاس Staff)
+-- =====================================================
+INSERT INTO Manager (staff_id, management_level, bonus) VALUES
+(1, 'مدیرعامل', 5000000),
+(5, 'مدیر اجرایی', 4500000),
+(9, 'مدیر شعبه', 4000000);
+
+-- =====================================================
+-- 9. داده‌های جدول Receptionist (ساب‌کلاس Staff)
+-- =====================================================
+INSERT INTO Receptionist (staff_id, shift, desk_number) VALUES
+(2, 'morning', 1),
+(6, 'evening', 2),
+(10, 'night', 1);
+
+-- =====================================================
+-- 10. داده‌های جدول Housekeeping (ساب‌کلاس Staff)
+-- =====================================================
+INSERT INTO Housekeeping (staff_id, area_responsibility, tools_assigned) VALUES
+(3, 'طبقات 1 تا 3', 'جاروبرقی، مواد شوینده'),
+(7, 'تمامی طبقات', 'جاروبرقی، مواد شوینده، تجهیزات نظافت');
+
+-- =====================================================
+-- 11. داده‌های جدول Reservation
+-- =====================================================
+INSERT INTO Reservation (reservation_number, check_in_date, check_out_date, nights, total_guests, adults, children, status, estimated_total, booking_method, discount_code, room_id, customer_id) VALUES
+('RES001', '2026-05-15', '2026-05-18', 3, 2, 2, 0, 'confirmed', 1650000, 'online', 'WELCOME10', 1, 1),
+('RES002', '2026-05-20', '2026-05-23', 3, 2, 2, 0, 'confirmed', 1650000, 'online', NULL, 1, 2),
+('RES003', '2026-05-25', '2026-05-28', 3, 2, 2, 0, 'pending', 1650000, 'phone', NULL, 2, 3),
+('RES004', '2026-06-01', '2026-06-06', 5, 4, 2, 2, 'confirmed', 6500000, 'online', 'FAMILY20', 6, 4),
+('RES005', '2026-06-10', '2026-06-12', 2, 2, 2, 0, 'cancelled', 1100000, 'online', NULL, 3, 5),
+('RES006', '2026-06-15', '2026-06-20', 5, 3, 3, 0, 'confirmed', 6500000, 'online', 'VIP10', 5, 6),
+('RES007', '2026-06-18', '2026-06-22', 4, 2, 2, 0, 'confirmed', 2200000, 'in_person', NULL, 4, 7),
+('RES008', '2026-07-01', '2026-07-03', 2, 1, 1, 0, 'pending', 840000, 'online', NULL, 10, 8),
+('RES009', '2026-07-05', '2026-07-10', 5, 2, 2, 0, 'confirmed', 2750000, 'phone', 'SUMMER15', 7, 9),
+('RES010', '2026-07-15', '2026-07-17', 2, 2, 2, 0, 'confirmed', 1040000, 'online', NULL, 8, 10);
+
+-- =====================================================
+-- 12. داده‌های جدول Payment
+-- =====================================================
+INSERT INTO Payment (payment_number, amount, payment_method, transaction_tracking_id, status, source_account_name, reservation_id) VALUES
+('PAY001', 1650000, 'online', 'TRX123456', 'successful', 'احمد رضایی', 1),
+('PAY002', 1650000, 'online', 'TRX123457', 'successful', 'مریم کریمی', 2),
+('PAY003', 1650000, 'cash', NULL, 'pending', 'رضا نوروزی', 3),
+('PAY004', 3000000, 'online', 'TRX123458', 'successful', 'سارا احمدی', 4),
+('PAY005', 3500000, 'card', NULL, 'successful', 'علی محمدی', 4),
+('PAY006', 1100000, 'online', 'TRX123459', 'failed', 'احمد رضایی', 5),
+('PAY007', 6500000, 'online', 'TRX123460', 'successful', 'فاطمه حسینی', 6),
+('PAY008', 2200000, 'cash', NULL, 'successful', 'حسین عباسی', 7),
+('PAY009', 840000, 'online', 'TRX123461', 'successful', 'زهرا قاسمی', 8),
+('PAY010', 2750000, 'online', 'TRX123462', 'successful', 'مهدی کاظمی', 9);
+
+-- =====================================================
+-- 13. داده‌های جدول Invoice
+-- =====================================================
+INSERT INTO Invoice (invoice_number, grand_total, paid_amount, remaining_amount, cost_details, status, reservation_id, customer_id, issued_by_staff_id) VALUES
+('INV001', 1650000, 1650000, 0, 'اقامت 3 شب اتاق 101', 'settled', 1, 1, 2),
+('INV002', 1650000, 1650000, 0, 'اقامت 3 شب اتاق 101', 'settled', 2, 2, 2),
+('INV003', 1650000, 1000000, 650000, 'اقامت 3 شب اتاق 102', 'unsettled', 3, 3, 6),
+('INV004', 6500000, 6500000, 0, 'اقامت 5 شب اتاق 301 + خدمات ویژه', 'settled', 4, 4, 2),
+('INV005', 1100000, 0, 1100000, 'اقامت 2 شب اتاق 201', 'unsettled', 5, 5, 2),
+('INV006', 6500000, 6500000, 0, 'اقامت 5 شب اتاق 501', 'settled', 6, 6, 10),
+('INV007', 2200000, 2200000, 0, 'اقامت 4 شب اتاق 202', 'settled', 7, 7, 2),
+('INV008', 840000, 840000, 0, 'اقامت 2 شب اتاق 110', 'settled', 8, 8, 10),
+('INV009', 2750000, 2750000, 0, 'اقامت 5 شب اتاق 105', 'settled', 9, 9, 2),
+('INV010', 1040000, 1040000, 0, 'اقامت 2 شب اتاق 205', 'settled', 10, 10, 6);
+
+-- =====================================================
+-- 14. داده‌های جدول Corporate_Invoice (ساب‌کلاس Invoice)
+-- =====================================================
+INSERT INTO Corporate_Invoice (invoice_id, company_name, company_registration_number) VALUES
+(2, 'شرکت فناوری اطلاعات پارس', '1234567890'),
+(6, 'بازرگانی سامان', '9876543210'),
+(9, 'سازمان گردشگری آفتاب', '1122334455');
+
+-- =====================================================
+-- 15. داده‌های جدول Individual_Invoice (ساب‌کلاس Invoice)
+-- =====================================================
+INSERT INTO Individual_Invoice (invoice_id, national_id_customer) VALUES
+(1, '0012345678'),
+(3, '0023456789'),
+(4, '0034567890'),
+(5, '0045678901'),
+(7, '0056789012'),
+(8, '0067890123'),
+(10, '0078901234');
+
+-- =====================================================
+-- 16. داده‌های جدول Service
+-- =====================================================
+INSERT INTO Service (service_name, description, base_fee, unit_of_measure, service_hours, responsible_staff_id, room_id, customer_id, reservation_id) VALUES
+('روم سرویس', 'سرویس غذا در اتاق', 150000, 'count', '24 ساعته', 2, 1, 1, 1),
+('خشکشویی', 'خشکشویی البسه', 50000, 'kg', '8:00 - 20:00', 3, 1, 1, 1),
+('تاکسی سرویس', 'خدمات حمل و نقل', 200000, 'count', '24 ساعته', 2, 2, 2, 2),
+('ماساژ', 'ماساژ حرفه‌ای', 300000, 'hourly', '10:00 - 22:00', 1, 5, 6, 6),
+('تحویل غذا', 'سرویس غذا به درب اتاق', 120000, 'count', '24 ساعته', 2, 6, 4, 4),
+('نظافت اضافی', 'نظافت ویژه اتاق', 80000, 'count', 'ساعت درخواستی', 3, 3, 5, NULL),
+('سرویس نوشیدنی', 'نوشیدنی سرد و گرم', 60000, 'count', '24 ساعته', 2, 4, 7, 7),
+('اینترنت پرسرعت', 'اینترنت اختصاصی', 50000, 'count', '24 ساعته', 8, 8, 9, 9),
+('ترانسفر فرودگاه', 'سرویس رفت و برگشت فرودگاه', 350000, 'count', 'قبلی هماهنگی', 10, 9, 10, 10),
+('ساتوکار', 'خدمات ساتوکار و پذیرایی', 180000, 'hourly', '8:00 - 18:00', 1, 10, 8, 8);
+
+-- =====================================================
+-- 17. داده‌های جدول Feedback
+-- =====================================================
+INSERT INTO Feedback (customer_id, reservation_id, feedback_text, overall_rating, room_quality_rating, service_quality_rating, staff_behavior_rating, status, feedback_status) VALUES
+(1, 1, 'هتل بسیار عالی بود، اتاق تمیز، کارکنان خوش‌برخورد', 5, 5, 4, 5, 'done', 'approved'),
+(2, 2, 'اتاق خوب بود ولی سرویس غذا دیر رسید', 4, 4, 3, 4, 'done', 'approved'),
+(3, 3, 'مشکل در سیستم تهویه اتاق داشتیم', 3, 3, 4, 4, 'processing', 'pending'),
+(4, 4, 'اقامت فوق‌العاده‌ای بود، حتما برمی‌گردیم', 5, 5, 5, 5, 'done', 'approved'),
+(5, 5, 'رزرو کنسل شد، اما پشتیبانی خوب بود', 4, NULL, 4, 4, 'done', 'approved'),
+(6, 6, 'سوئیت رویال بی‌نظیر بود، ممنون از همه', 5, 5, 5, 5, 'done', 'approved'),
+(7, 7, 'نسبت به قیمت، اتاق کوچک بود', 3, 3, 3, 4, 'done', 'approved'),
+(8, 8, 'تمیزی خوب، کارکنان خوش‌اخلاق', 4, 4, 4, 5, 'pending', 'pending'),
+(9, 9, 'خدمات خشکشویی عالی بود', 4, 4, 5, 4, 'processing', 'pending'),
+(10, 10, 'هتل خوبی بود، موقعیت مکانی عالی', 4, 4, 4, 4, 'done', 'approved');
