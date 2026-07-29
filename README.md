@@ -1,62 +1,90 @@
 # Hotel Management System
 
-A web-based Hotel Management System (HMS) designed to simplify and automate hotel operations for guests, staff, and administrators.
+A web-based **Hotel Management System (HMS)** designed to simplify and automate hotel operations for guests, staff, and administrators.
 
-The system provides an integrated platform for managing room reservations, payments, invoices, room statuses, hotel services, staff operations, and customer feedback. It is designed as a practical example of a multi-entity relational database system with structured workflows and role-based access.
+The system provides an integrated platform for managing room reservations, payments, invoices, room statuses, hotel services, staff operations, and customer feedback.
+
+This project demonstrates a practical multi-entity relational database system with structured workflows, role-based access control, and centralized data management.
+
+---
 
 ## Project Objective
 
-The objective of this project is to design and implement a smart and organized hotel management platform that improves operational efficiency, reduces manual errors, and supports better decision-making through centralized data management and reporting.
+The objective of this project is to design and implement a smart and organized hotel management platform that improves operational efficiency, reduces manual errors, and supports better decision-making through centralized information management.
 
-## Core Features
+---
+
+# Core Features
 
 - Guest account and reservation management
 - Room browsing and filtering by:
-  - room type
-  - capacity
-  - date range
-  - price
+  - Room type
+  - Capacity
+  - Date range
+  - Price
 - Reservation registration and confirmation
 - Online and offline payment tracking
 - Automatic invoice generation
-- Additional service request handling
-- Real-time room status management
-- Staff information and access control management
-- Customer feedback and rating registration
-- Administrative reporting and analytics
+- Additional service request management
+- Room status management
+- Staff information and role management
+- Customer feedback and rating system
+- Administrative reports and analytics
 
-## User Roles
+---
 
-### Admin / Manager
-Full system access, including:
-- hotel information management
-- room and room type management
-- reservation monitoring and control
-- payment and invoice review
-- staff management
-- service management
-- customer feedback analysis
-- managerial reports
+# User Roles
 
-### Staff
-Access depends on role:
-- Reception: reservation and guest handling
-- Cashier: payment and invoice processing
-- Cleaning Supervisor: room status updates
-- Service Staff: service request execution
+## Admin / Manager
 
-### Customer / Guest
-Limited access to personal operations:
-- browse available rooms
-- make reservations
-- complete payments
-- view invoices
-- request services
-- submit feedback
+Full system access:
 
-## Main Entities
+- Hotel information management
+- Room and room type management
+- Reservation monitoring
+- Payment and invoice management
+- Staff management
+- Service management
+- Customer feedback analysis
+- Reports and analytics
 
-The system is built around the following core entities:
+---
+
+## Staff
+
+Access based on assigned roles:
+
+- Reception:
+  - Reservation and guest management
+
+- Cashier:
+  - Payment and invoice processing
+
+- Cleaning Supervisor:
+  - Room status updates
+
+- Service Staff:
+  - Service request handling
+
+---
+
+## Customer / Guest
+
+Customers can:
+
+- Browse available rooms
+- Filter rooms
+- Make reservations
+- Complete payments
+- View invoices
+- Request additional services
+- Submit feedback
+
+---
+
+# Main Entities
+
+The system is built around the following entities:
 
 - Hotel
 - Customer
@@ -69,7 +97,9 @@ The system is built around the following core entities:
 - Staff
 - Feedback
 
-## Entity Relationships
+---
+
+# Entity Relationships
 
 - One hotel has many rooms
 - One hotel has many staff members
@@ -81,59 +111,165 @@ The system is built around the following core entities:
 - One staff member can provide multiple services
 - One reservation can have associated feedback
 
-## Workflow Overview
+---
 
-1. The guest logs into the system.
-2. The guest searches for available rooms using filters.
-3. A reservation is created with a pending confirmation status.
-4. The guest proceeds to payment.
-5. After successful payment, the reservation status becomes confirmed.
-6. The system generates an invoice.
-7. During the stay, the guest can request additional services.
-8. Staff process operational tasks through the management panel.
-9. At checkout, the final settlement is completed.
-10. The guest can submit feedback and ratings.
+# Workflow Overview
 
-## Sample Reports
+1. Guest logs into the system
+2. Guest searches available rooms
+3. Reservation is created
+4. Payment process is completed
+5. Reservation status changes to confirmed
+6. Invoice is generated
+7. Additional services can be requested
+8. Staff manage operational tasks
+9. Checkout and final settlement are completed
+10. Guest submits feedback
+
+---
+
+# Sample Reports
 
 The system can generate reports such as:
 
 - Active and upcoming reservations
-- Currently resident guests
-- Occupied, vacant, and out-of-service rooms
-- Guests with luxury or suite reservations
-- Daily, weekly, and monthly revenue reports
-- Employee and staff role lists
-- Guest service request reports
+- Current resident guests
+- Occupied and available rooms
+- Revenue reports
+- Employee role lists
+- Service request reports
 - Customer feedback analysis
 - Unsettled invoices
-- Complete stay history of a specific guest
+- Complete guest stay history
 
-## Database Design Scope
+---
 
-This project is also intended as a relational database design example and demonstrates:
+# Database Design Scope
+
+This project demonstrates:
 
 - One-to-Many relationships
-- Many-to-Many relationships through intermediary structures
-- logical and physical database design
-- reduction of data redundancy
-- improved data consistency
-- support for reporting and analytics
+- Many-to-Many relationships through intermediate tables
+- Logical and physical database design
+- Data normalization
+- Reduction of data redundancy
+- Data consistency improvement
+- Reporting and analytics support
 
-## Suggested Technology Stack
+---
 
-Replace this section with your actual implementation stack.
+# Technology Stack
 
-- Frontend: HTML, CSS, JavaScript
-- Backend: PHP / Node.js / Python / ASP.NET
-- Database: MySQL / PostgreSQL / SQL Server
+## Frontend
+- HTML
+- CSS
+- JavaScript
 
-## Project Structure
-```bash
+## Backend
+- Python
+- Flask
+
+## Database
+- MySQL
+
+---
+
+# Project Structure
+
+```
 hotel-management-system/
-├── docs/
-├── database/
-├── backend/
-├── frontend/
-├── reports/
+│
+├── hotel-backend/     # Flask backend application
+│
+├── frontend/          # Frontend source code
+│
+├── database/          # Database scripts and schema
+│
+├── document/          # Project documentation
+│
+├── screenshots/       # Application screenshots
+│
 └── README.md
+```
+
+---
+
+# Screenshots
+
+## About Page
+
+![About Page](screenshots/about.png)
+
+## Booking Page
+
+![Booking Page](screenshots/booking.png)
+
+## Gallery Page
+
+![Gallery Page](screenshots/gallery.png)
+
+## Contact Page (Light Mode)
+
+![Contact Light](screenshots/contact_light.png)
+
+## Contact Page (Dark Mode)
+
+![Contact Dark](screenshots/contact_dark.png)
+
+---
+
+# Installation
+
+## Backend Setup
+
+Navigate to backend folder:
+
+```bash
+cd hotel-backend
+```
+
+Create virtual environment:
+
+```bash
+python -m venv env
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run Flask server:
+
+```bash
+python app.py
+```
+
+---
+
+## Database Setup
+
+Import the SQL files from:
+
+```
+database/
+```
+
+Configure database connection settings in the backend configuration file.
+
+---
+
+# Future Improvements
+
+- Online payment gateway integration
+- Email notifications
+- Mobile application
+- Advanced analytics dashboard
+- Cloud deployment
+
+---
+
+# Contributors
+
+Developed as a full-stack hotel management system project.
