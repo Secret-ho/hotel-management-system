@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N.M.N Luxury Hotel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+</head>
+
+<body>
+    <nav id="navbar">
+        <div id="progressBar"></div>
+
+        <div class="logo">N.M.N HOTEL</div>
+        <ul class="nav-links">
+            <li><a class="active" href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <button id="theme-toggle" aria-label="Toggle theme">
+            <i class="fa-solid fa-sun"></i>
+            <div class="toggle-thumb"></div>
+            <i class="fa-solid fa-moon"></i>
+        </button>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content fade-in">
+            <h1>Experience Pure Luxury</h1>
+            <p>Your perfect escape in the heart of the city.</p>
+        </div>
+
+        <div class="fade-in">
+            <div class="booking-container">
+                <form id="bookingForm">
+                    <!-- Booking bar (step 1) -->
+                    <div class="booking-bar">
+                        <div class="input-group">
+                            <label for="checkin">Check-in</label>
+                            <input type="date" id="checkin" name="checkin" required min="">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="checkout">Check-out</label>
+                            <input type="date" id="checkout" name="checkout" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="guests">Guests</label>
+                            <input type="number" id="guests" name="guests" min="1" max="10" value="1" required>
+                        </div>
+
+                        <div class="price-display">
+                            <span id="totalPrice">Total:</span>
+                        </div>
+
+                        <div class="input-group">
+                            <button type="button" id="continueBtn" class="btn-gold">Continue</button>
+                        </div>
+                        <!-- Reserve button (will appear under Continue) -->
+                        <button type="submit" id="reserveBtn" class="btn-gold" style="display:none">Book Now</button>
+                    </div>
+
+                    <!-- Personal info (step 2) - hidden until Continue -->
+                    <div id="personalInfoRow" class="personal-row">
+                        <div class="input-group">
+                            <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="nationalId" name="nationalId" placeholder="National ID" required
+                                maxlength="10" pattern="[0-9]{10}">
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="mobile" name="mobile" placeholder="Mobile Number" required
+                                maxlength="11" pattern="[0-9]{11}">
+                        </div>
+
+                        <!-- reserve button moved to booking-bar to align under Continue -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <section class="rooms">
+        <h2 class="section-title fade-in">Our Rooms</h2>
+
+        <div class="grid-container">
+
+            <div class="fade-in">
+                <div class="card">
+                    <img src="../assets/hotel-bg.jpg" alt="Deluxe Room">
+                    <h3>Deluxe Pearl Room</h3>
+                    <p>Spacious room with a city view.</p>
+                </div>
+            </div>
+
+            <div class="fade-in">
+                <div class="card">
+                    <img src="../assets/room2.webp" alt="Suite">
+                    <h3>Gold Executive Suite</h3>
+                    <p>Ultimate luxury and premium services.</p>
+                </div>
+            </div>
+
+            <div class="fade-in">
+                <div class="card">
+                    <img src="../assets/room3.jpg" alt="Royal Room">
+                    <h3>Royal N.M.N Suite</h3>
+                    <p>The pinnacle of elegance and comfort.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="facilities fade-in">
+        <h2 class="section-title">Dining & Cafe</h2>
+
+        <div class="grid-container">
+
+            <div class="fade-in">
+                <div class="card">
+                    <img src="../assets/restaurant.jpg" alt="Fine Dining">
+                    <h3>Golden Fork Restaurant</h3>
+                    <p>Experience world-class culinary masterpieces prepared by our executive chefs.</p>
+                </div>
+            </div>
+
+            <div class="fade-in">
+                <div class="card">
+                    <img src="../assets/cafe.jpg" alt="Luxury Cafe">
+                    <h3>The Pearl Cafe</h3>
+                    <p>Relax with premium coffee blends and artisanal pastries in a serene atmosphere.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="facilities fade-in">
+        <h2 class="section-title">Spa & Wellness</h2>
+
+        <div class="grid-container">
+
+            <div class="fade-in">
+                <div class="card">
+                    <img src="../assets/massage.jpg" alt="Spa Massage">
+                    <h3>N.M.N Tranquility Spa</h3>
+                    <p>Rejuvenate your body and mind with our signature massage therapies.</p>
+                </div>
+            </div>
+
+            <div class="fade-in">
+                <div class="card">
+                    <img src="../assets/pool.webp" alt="Indoor Pool">
+                    <h3>Indoor Heated Pool</h3>
+                    <p>Take a dip in our gold-tiled infinity pool, open year-round for guests.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="gallery">
+        <h2 class="section-title fade-in">Gallery</h2>
+
+        <div class="grid-container">
+            <img src="../assets/gallery1.jpg" alt="Gallery 1" class="fade-in">
+            <img src="../assets/gallery2.jpg" alt="Gallery 2" class="fade-in">
+            <img src="../assets/gallery3.jpg" alt="Gallery 3" class="fade-in">
+        </div>
+    </section>
+
+    <footer class="fade-in">
+        <p>&copy; 2026 N.M.N Luxury Hotel. All rights reserved.</p>
+    </footer>
+
+    <button id="backToTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+
+    <script src="../js/main.js" type="module"></script>
+</body>
+
+</html>

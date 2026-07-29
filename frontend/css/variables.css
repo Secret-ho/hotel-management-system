@@ -1,0 +1,33 @@
+:root {
+    --gold: #b18543e4;
+    --dark-gold: rgb(149, 118, 68);
+    --text-dark: #333333;
+    --border-color: #3838384a;
+    --bg-light: #ffffff;
+    --nav-bg: rgba(240, 238, 225, 0.93);
+    --form-bg: rgba(255, 255, 255, 0.5);
+    --card-bg: #e5e3e3d2;
+    --toggle-bg-light: #b8b6b6e2;
+    --toggle-bg-dark: #1f2937;
+    --toggle-thumb-light: #ffffff;
+    --toggle-thumb-dark: #4e6d95cf;
+    --toggle-sun: #fbbe24bf;
+    --toggle-moon: #7a7a79;
+}
+
+.dark-mode {
+    --gold: #d4af6ae4;
+    --dark-gold: #b8935a;
+    --text-dark: #e8e6e1;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --bg-light: #16181a;
+    --nav-bg: rgba(32, 36, 42, 0.95);
+    --form-bg: rgba(0, 0, 0, 0.1);
+    --card-bg: #21262f;
+    --toggle-bg-light: #4a4d52;
+    --toggle-bg-dark: #2a3548;
+    --toggle-thumb-light: #d4af6a;
+    --toggle-thumb-dark: #6f8db8d5;
+    --toggle-sun: #e0b85c;
+    --toggle-moon: #b7b5b2;
+}

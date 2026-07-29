@@ -1,0 +1,30 @@
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-content.fade-in h1,
+.hero-content.fade-in p {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.hero-content.fade-in h1 {
+    transition: opacity 1s ease-out 0.1s, transform 1s ease-out 0.1s;
+}
+
+.hero-content.fade-in p {
+    transition: opacity 1s ease-out 0.4s, transform 1s ease-out 0.4s;
+}
+
+.hero-content.fade-in.visible h1,
+.hero-content.fade-in.visible p {
+    opacity: 1;
+    transform: translateY(0);
+}

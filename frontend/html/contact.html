@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | N.M.N Hotel</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+</head>
+
+<body>
+
+    <nav id="navbar">
+        <div class="logo">N.M.N HOTEL</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a class="active" href="contact.html">Contact</a></li>
+        </ul>
+        <button id="theme-toggle" aria-label="Toggle theme">
+            <i class="fa-solid fa-sun"></i>
+            <div class="toggle-thumb"></div>
+            <i class="fa-solid fa-moon"></i>
+        </button>
+    </nav>
+
+    <section class="contact-container fade-in">
+        <h1 class="section-title">Get In Touch</h1>
+
+        <p class="contact-subtitle">
+            We'd love to hear from you. Contact us anytime.
+        </p>
+
+        <address class="contact-info">
+            <h3>Contact Information</h3>
+
+            <p data-copy="123 Pearl Avenue, Golden District">
+                <i class="fa-solid fa-location-dot"></i>
+                123 Pearl Avenue, Golden District
+                <span class="copy-feedback">Copied!</span>
+            </p>
+
+            <p data-copy="+1 (555) 123-4567">
+                <i class="fa-solid fa-phone"></i>
+                +1 (555) 123-4567
+                <span class="copy-feedback">Copied!</span>
+            </p>
+
+            <p data-copy="info@nmnhotel.com">
+                <i class="fa-solid fa-envelope"></i> info@nmnhotel.com
+                <span class="copy-feedback">Copied!</span>
+            </p>
+        </address>
+
+        <div class="contact-form-box">
+            <h3>Send us a message</h3>
+
+            <form>
+                <div class="input-group">
+                    <label for="contactName" class="sr-only">Name</label>
+                    <input type="text" id="contactName" name="name" placeholder="Name" required autocomplete="name">
+                </div>
+
+                <div class="input-group">
+                    <label for="contactEmail" class="sr-only">Email</label>
+                    <input type="email" id="contactEmail" name="email" placeholder="Email" required
+                        autocomplete="email">
+                </div>
+
+                <div class="input-group">
+                    <label for="contactMessage" class="sr-only">Message</label>
+                    <textarea id="contactMessage" name="message" rows="5" placeholder="Message" required></textarea>
+                </div>
+
+                <button type="submit" class="btn-gold">
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 N.M.N Luxury Hotel. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/main.js" type="module"></script>
+
+</body>
+
+</html>
